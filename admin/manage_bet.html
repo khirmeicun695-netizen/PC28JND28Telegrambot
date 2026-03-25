@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>投注管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="js/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                		
+                        <label class="layui-form-label" style="margin: 0;padding: 0;height: 42px;border: none;width: 100px;">
+                			
+                			<button class="layui-btn" id="tabs">
+                				<p id="tabs-text" style="text-align: center;"></p>
+                				 <!--i class="layui-icon layui-icon-down layui-font-12"></i-->
+                			</button>
+                		</label>
+                        <div class="layui-input-inline">
+                            <input type="text" id="input_value" autocomplete="off" class="layui-input" placeholder="请输入关键词">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+    </div>
+</div>
+
+<script src="js/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script src="config.js"></script>
+<script>
+var type = "电报ID";
+var typeName = "telegramid";
+var checkSum = 0;//初始化选中数量
+var data = [];
+var selectData = []; //选中的数据
+var isSelectAll = false; //是否选择了全选按钮
+var session = $.cookie('session');
+var id = $.cookie('id');
+var name = $.cookie('name');
+var userinfo = {};
+var alert; 
+
+	/*加载事件*/
+	$(function () {
+		$("#tabs-text").text(type); //添加默认标签
+		$.ajax({
+			type:"get",
+			url: url+"/table/bet",
+			async:false,
+			data:{
+				"cookie":$.cookie('session')
+			},
+			success:function(msg){
+				data = msg.data;
+				layui.use(['form', 'table'])
+			},
+			error:function(err){
+				layer.msg('登录过期，请刷新主页后重新登录！');
+			}
+		})
+	}); 
+	
+	/*配置搜索选项*/
+	layui.use('dropdown', function(){
+	  var dropdown = layui.dropdown
+	  dropdown.render({
+	    elem: '#tabs' //可绑定在任意元素中，此处以上述按钮为例
+	    ,data: [{
+	      title: '电报ID',
+		  name:"telegramid"
+	    },{
+	      title: '用户名',
+		  name:"name"
+	    },{
+	      title: '昵称',
+		  name:"firstname"
+	    },{
+	      title: '金额',
+		  name:"amount"
+	    },{
+	      title: '投注内容',
+		  name:"guess"
+	    },{
+	      title: '期号',
+		  name:"resultid"
+	    },{
+	      title: '结果',
+		  name:"result"
+	    },{
+	      title: '当前余额',
+		  name:"nowbalance"
+	    },{
+	      title: '是否领取反水',
+		  name:"isreturn"
+	    }]
+	    ,id: 'tabs'
+	    //菜单被点击的事件
+	    ,click: function(obj){
+		  type = obj.title;
+		  typeName = obj.name;
+		  $("#tabs-text").text(type)
+	    }
+	  });
+	});
+	/*表格配置*/
+	layui.use(['form', 'table'], function () {
+	    var form = layui.form;
+	    var table = layui.table;
+	    table.render({
+	        elem: '#currentTableId',
+	        data:data,
+	        toolbar: '#toolbarDemo',
+			title:"报废管理表",
+			text: {
+			    none: '暂无相关数据' //默认：无数据。
+			},
+			defaultToolbar: ['filter', 'exports', 'print'],
+	        cols: [[
+				{field: 'id', title: 'ID', sort: true},
+				{field: 'telegramid', title: '电报ID'},
+				{field: 'name', title: '用户名'},
+	            {field: 'firstname', title: '昵称'},
+				{field: 'amount', title: '金额', sort: true},
+				{field: 'guess', title: '投注内容'},
+				{field: 'time',  title: '操作时间', sort: true},
+				{field: 'resultid', title: '期号', sort: true},
+				{field: 'result', title: '结果'},
+				{field: 'nowbalance', title: '当前余额'},
+				{field: 'isreturn',width:150, title: '是否领取反水'},
+				{field: 'amountreturn',width:150, title: '反水金额'}
+	        ]],
+	        limits: [10, 15, 20, 25, 50, 100],
+	        limit: 10,
+	        page: true,
+	        skin: 'line'
+	    });
+	
+	    // 监听搜索操作
+	    form.on('submit(data-search-btn)', function (res) {
+	    	table.reload('currentTableId',{
+	    		url: `${url}/table/bet/search?cookie=${$.cookie('session')}&key=${typeName}&value=${$('#input_value').val()}`
+	    	}, true)
+	    });
+	
+	    /*选择框监听事件*/
+	    table.on('toolbar(currentTableFilter)', function (obj) {
+			/*判断是否已经选择*/
+			if(selectData.length==0){
+				if(obj.event=="delete"){
+					layer.msg('选择为空！');
+					return;
+				}
+			}
+			/*选择框监听“添加用户”操作*/
+	        if (obj.event === 'add') {  
+	            alert = layer.alert(`<div class="layui-form" style="margin-top: 30px;width: auto;">
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">瓶号</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<select name="瓶号" id="瓶号" lay-search="" lay-verify="required" lay-reqtext="瓶号不能为空">
+								  <option value=""></option>
+								</select>
+							</div>
+						</div>
+	            		<div class="layui-form-item">
+	            			<label class="layui-form-label" style="width: 60px !important;">数量</label>
+	            			<div class="layui-input-block" style="margin-left: 90px !important;">
+	            				<input type="text" name="数量" id="数量" lay-verify="required" lay-reqtext="数量不能为空" placeholder="请输入数量" value="" class="layui-input">
+	            			</div>
+	            		</div>
+	            		<div class="layui-form-item">
+	            			<label class="layui-form-label" style="width: 60px !important;">备注</label>
+	            			<div class="layui-input-block" style="margin-left: 90px !important;">
+	            				<input type="text" name="注释" id="注释" placeholder="请输入备注(非必填)" value="" class="layui-input">
+	            			</div>
+	            		</div>
+	            		<div class="layui-form-item">
+	            			<div class="layui-input-block" style="margin-left: 0px !important;display: flex;justify-content: center;">
+	            				<button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveNewUserBtn">确认</button>
+	            			</div>
+	            		</div>
+	            	</div>`
+	            , {
+	            	area: ['100%', '100%'],
+	                skin: 'layui-layer-lan',
+	                closeBtn: 1,
+	            	btn:[],
+	            	title:"添加报废记录",
+	            	success(){
+						$.ajax({
+							type:"get",
+							url: url+"/Dispose",
+							data:{
+								"cookie":$.cookie('session')
+							},
+							success:function(msg){
+								var DisposeInfo = msg.data;
+								for (var i = 0; i < DisposeInfo.length; i++) {
+									$('#瓶号').append(`
+										<option value="${DisposeInfo[i]['瓶号']}">${DisposeInfo[i]['瓶号']}</option>
+									`)
+								}
+								form.render('select');
+							},
+							error:function(err){
+								layer.msg('登录过期，请刷新主页后重新登录！');
+							}
+						})
+	            	}
+	            });
+	            return false;
+	        } else if (obj.event === 'delete') {  // 
+			/*选择框监听删除操作*/
+	            layer.confirm('您一共选择了'+selectData.length+'种试剂，请谨慎删除！' , 
+				function(index){
+					var deleteArray = "";
+					for (var i = 0; i < selectData.length; i++) {
+						if(i==selectData.length-1){
+							deleteArray += parseInt(selectData[i]['瓶号']);
+						}else{
+							deleteArray += parseInt(selectData[i]['瓶号'])+',';
+						}
+					}
+					$.ajax({
+						type:"delete",
+						url:url+"/Scrap",
+						contentType:"json/application",
+						dataType:"json",
+						data:JSON.stringify({
+							"cookie":session,
+							"Scrapinfo":deleteArray,
+						}),
+						success:function(msg){
+							if(msg.status==200){
+								layer.msg("删除成功!");
+								table.reload('currentTableId', {}, form);
+							}else{
+								layer.msg("删除失败!");
+							}
+						},
+						error:function(err){
+							if(err.status==200){
+								layer.msg("删除成功!");
+							}else{
+								layer.msg("删除失败!");
+							}
+						},
+						complete(){
+							table.reload('currentTableId',{
+								url: url+'/Scrap?cookie='+$.cookie('session')
+							}, true)
+							selectData = [];
+						}
+					})
+					layer.close(index);
+	            });
+	        }
+	    });
+	
+	    /*复选框选择逻辑处理*/
+	    table.on('checkbox(currentTableFilter)', function (obj) {
+			if (obj.type=="all" && isSelectAll==false) {
+				isSelectAll = true;
+				selectData=[];
+				for (var i = 0; i < data.length; i++) {
+					selectData.push(data[i]) 
+				}
+			}else if(obj.type=="all" && isSelectAll==true){
+				isSelectAll =false;
+				selectData = [];
+			}else if(obj.type=="one" && obj.checked==true){
+				selectData.push(obj.data);
+				if(data.length==selectData.length){
+					isSelectAll=true;
+				}
+			}else if(obj.type=="one" && obj.checked==false){
+				if(data.length==selectData.length){
+					isSelectAll=false;
+				}
+				for (var i = 0; i < selectData.length; i++) {
+				  if (selectData[i]['工号']==obj.data['工号']){
+				    selectData.splice(i, 1);
+				  }
+				}
+			}
+	    });
+		
+		layui.use(['form'], function () {
+		    var form = layui.form;
+		    var layer = layui.layer;
+		    /*确认修改用户信息*/
+		    form.on('submit(saveBtn)', function (data) {
+				var reagentinfo = data.field;
+				reagentinfo['报废多少天'] = 0;
+				reagentinfo['唯一的试剂序列号'] = parseInt(reagentinfo['唯一的试剂序列号']);
+				$.ajax({
+					type:"put",
+					dataType:"json",
+					url:url+"/Reagent",
+					data:JSON.stringify({
+						"reagentinfo":reagentinfo,
+						"cookie":session
+					}),
+					success:function(msg){
+						if(msg.status==200 || msg.status==204){
+							layer.msg('修改成功！');
+						}else{
+							layer.msg('修改失败！');
+						}
+					},
+					error:function(err){
+						if(err.status==200 || err.status==204){
+							layer.msg('修改成功！');
+						}else{
+							layer.msg('修改失败！');
+						}
+					},
+					complete(){
+						table.reload('currentTableId',{
+							url: url+'/Scrap?cookie='+$.cookie('session')
+						}, true)
+						selectData = [];
+					}
+				})
+				layer.close(alert);
+		        return false;
+		    });
+			
+			/*添加新用户*/
+			form.on('submit(saveNewUserBtn)', function (data) {
+				var scrapinfo = data.field;
+				var date = new Date();
+				scrapinfo['日期'] = date.getFullYear()+"-"+(date.getMonth()+1<10?'0'+(date.getMonth()+1):date.getMonth()+1)+"-"+(date.getDate()<10?'0'+date.getDate():date.getDate())+"T"+(date.getHours()<10?'0'+date.getHours():date.getHours())+":"+(date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())+":"+(date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds())
+				scrapinfo['用户名'] = $.cookie('name');
+				$.ajax({
+					type:"post",
+					dataType:"json",
+					url:url+"/Scrap",
+					data:JSON.stringify({
+						"scrapinfo":scrapinfo,
+						"cookie":session
+					}),
+					success:function(msg){
+						if(msg.status==200 || msg.status==204){
+							layer.msg('添加成功！');
+							table.reload('currentTableId', form);
+						}else{
+							layer.msg('添加失败！');
+						}
+					},
+					error:function(err){
+						if(err.status==200 || err.status==204){
+							layer.msg('添加成功！');
+						}else{
+							layer.msg('添加失败！');
+						}
+					},
+					complete(){
+						table.reload('currentTableId',{
+							url: url+'/Scrap?cookie='+$.cookie('session')
+						}, true)
+						selectData = [];
+					}
+				})
+			});
+		});
+	
+	    table.on('tool(currentTableFilter)', function (obj) {
+	        userinfo = obj.data;
+	        if (obj.event === 'edit') {
+				alert = layer.alert(`<div class="layui-form" style="margin-top: 30px;width: auto;">
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">试剂ID</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<input type="number" name="唯一的试剂序列号" id="唯一的试剂序列号" lay-verify="number" lay-reqtext="试剂ID不能为空" placeholder="请输入试剂ID" value="" disabled="disabled" class="layui-input layui-disabled" >
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">试剂名称</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<input type="text" name="试剂名称" id="试剂名称" lay-verify="required" lay-reqtext="试剂名称不能为空" placeholder="请输入试剂名称" value="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">试剂功能</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<input type="text" name="试剂的化学功能" id="试剂的化学功能" lay-verify="required" lay-reqtext="试剂功能不能为空"  placeholder="请输入试剂功能" value="" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">试剂类别</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<input type="text" name="试剂类别" id="试剂类别" lay-verify="required" lay-reqtext="试剂类别不能为空"  placeholder="请输入试剂类别" value="" class="layui-input">
+							</div>
+						</div>
+						
+						<div class="layui-form-item">
+							<label class="layui-form-label" style="width: 60px !important;">备注</label>
+							<div class="layui-input-block" style="margin-left: 90px !important;">
+								<input type="text" name="注释" id="注释"  placeholder="请输入备注（非必填）" value="" class="layui-input">
+								<!--div style="color:#a29c9c;font-size:12px !important;margin-left:10px;">非必填</div-->
+							</div>
+						</div>
+					
+						<div class="layui-form-item">
+							<div class="layui-input-block" style="margin-left: 0px !important;display: flex;justify-content: center;">
+								<button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认</button>
+							</div>
+						</div>
+					</div>`
+				, {
+					area: ['100%', '100%'],
+				    skin: 'layui-layer-lan',
+				    closeBtn: 1,
+					btn:[],
+					title:"编辑试剂信息",
+					success(){
+						$("#addUserType").text(addUserType);
+						$('#唯一的试剂序列号').val(userinfo['唯一的试剂序列号']);
+						$('#试剂名称').val(userinfo['试剂名称']);
+						$('#试剂的化学功能').val(userinfo['试剂的化学功能']);
+						$('#试剂类别').val(userinfo['试剂类别']);
+						$('#注释').val(userinfo['注释']);
+					}
+				});
+	            return false;
+	        } else if (obj.event === 'delete') {
+	            layer.confirm('请确认删除！', function (index) {
+					$.ajax({
+						type:"delete",
+						url:url+"/Scrap",
+						contentType:"json/application",
+						dataType:"json",
+						data:JSON.stringify({
+							"cookie":session,
+							"Scrapinfo":userinfo['瓶号'].toString(),
+						}),
+						success:function(msg){
+							if(msg.status==200){
+								layer.msg("删除成功!");
+							}else{
+								layer.msg("删除失败!");
+							}
+						},
+						error:function(err){
+							if(err.status==200){
+								layer.msg("删除成功!");
+							}else{
+								layer.msg("删除失败!");
+							}
+						},
+						complete(){
+							table.reload('currentTableId',{
+								url: url+'/Scrap?cookie='+$.cookie('session')
+							}, true)
+							selectData = [];
+						}
+					})
+					layer.close(index);
+	            });
+	        }
+	    });
+	});
+	
+</script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>首页</title>
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min.css?v=3.3.7" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <!-- Morris -->
+    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
+
+    <!-- Gritter -->
+    <link href="js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
+
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+    <style>
+        .mt-2{margin-top: 0.5rem !important} 
+
+        .mb-2{margin-bottom: 0.5rem !important}
+        
+        .ml-2{margin-left: 0.5rem !important}
+        
+        .mr-2{margin-right: 0.5rem !important}
+        
+        .mx-2{margin-right: 0.5rem !important;margin-left: 0.5rem !important}
+        
+        .my-2{margin-top: 0.5rem !important;margin-bottom: 0.5rem !important}
+    </style>
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content">
+		<div class="row">
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-success pull-right">今天</span>
+			            <h5>待操作充值申请</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="dczczsq_today"></h1>
+			            <small class="font-bold text-success">单位：次</small>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-danger pull-right">今天</span>
+			            <h5>待操作提现申请</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="dcztxsq_today"></h1>
+			            <small class="font-bold text-danger">单位：次</small>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-primary pull-right">今天</span>
+			            <h5>待提现</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="dtx_today"></h1>
+			            <small class="font-bold text-navy">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+		</div>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-sm-3">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-success pull-right">今天</span>
+                        <h5>今日流水</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" id="apply_today"></h1>
+                        <small class="font-bold text-success">单位：元</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-danger pull-right">今天</span>
+                        <h5>今日盈利</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" id="error_today"></h1>
+                        <small class="font-bold text-danger">单位：元</small>
+                    </div>
+                </div>
+            </div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-primary pull-right">今天</span>
+			            <h5>今日充值</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="pay_today"></h1>
+			            <small class="font-bold text-navy">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-warning pull-right">今天</span>
+			            <h5>今日提现</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="withdrawal_today"></h1>
+			            <small class="font-bold text-warning">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+            <div class="col-sm-3">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-success pull-right">今天</span>
+                        <h5>今日投注次数</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" id="check_today"></h1>
+                        <small class="font-bold text-success">单位：次</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-danger pull-right">今天</span>
+                        <h5>今日注册玩家</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" id="inventory_today"></h1>
+                        <small class="font-bold text-danger">单位：位</small>
+                    </div>
+                </div>
+            </div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-primary pull-right">今天</span>
+			            <h5>今日玩家胜率</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="shenglv_today"></h1>
+			            <small class="font-bold text-navy">单位：%</small>
+			        </div>
+			    </div>
+			</div>
+        </div>
+		<div class="row" style="margin-top: 20px;">
+		    <div class="col-sm-3">
+		        <div class="ibox float-e-margins">
+		            <div class="ibox-title">
+		                <span class="label label-success pull-right">所有</span>
+		                <h5>总流水</h5>
+		            </div>
+		            <div class="ibox-content">
+		                <h1 class="no-margins" id="apply_all"></h1>
+		                <small class="font-bold text-success">单位：元</small>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="col-sm-3">
+		        <div class="ibox float-e-margins">
+		            <div class="ibox-title">
+		                <span class="label label-danger pull-right">所有</span>
+		                <h5>总盈利</h5>
+		            </div>
+		            <div class="ibox-content">
+		                <h1 class="no-margins" id="error_all"></h1>
+		                <small class="font-bold text-danger">单位：元</small>
+		            </div>
+		        </div>
+		    </div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-primary pull-right">所有</span>
+			            <h5>总充值</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="pay_all"></h1>
+			            <small class="font-bold text-navy">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-warning pull-right">所有</span>
+			            <h5>总提现</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="withdrawal_all"></h1>
+			            <small class="font-bold text-warning">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+		    <div class="col-sm-3">
+		        <div class="ibox float-e-margins">
+		            <div class="ibox-title">
+		                <span class="label label-success pull-right">所有</span>
+		                <h5>总投注次数</h5>
+		            </div>
+		            <div class="ibox-content">
+		                <h1 class="no-margins" id="check_all"></h1>
+		                <small class="font-bold text-success">单位：次</small>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="col-sm-3">
+		        <div class="ibox float-e-margins">
+		            <div class="ibox-title">
+		                <span class="label label-danger pull-right">所有</span>
+		                <h5>总注册玩家</h5>
+		            </div>
+		            <div class="ibox-content">
+		                <h1 class="no-margins" id="inventory_all"></h1>
+		                <small class="font-bold text-danger">单位：位</small>
+		            </div>
+		        </div>
+		    </div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-primary pull-right">今天</span>
+			            <h5>总玩家胜率</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="shenglv_all"></h1>
+			            <small class="font-bold text-navy">单位：%</small>
+			        </div>
+			    </div>
+			</div>
+			<div class="col-sm-3">
+			    <div class="ibox float-e-margins">
+			        <div class="ibox-title">
+			            <span class="label label-warning pull-right">所有</span>
+			            <h5>总玩家余额</h5>
+			        </div>
+			        <div class="ibox-content">
+			            <h1 class="no-margins" id="balance_all"></h1>
+			            <small class="font-bold text-warning">单位：元</small>
+			        </div>
+			    </div>
+			</div>
+		</div>
+    </div>
+        
+    </div>
+    <!-- 全局js -->
+    <script src="js/jquery.min.js?v=2.1.4"></script>
+	<script src="js/jquery.cookie.js"></script>
+    <script src="js/bootstrap.min.js?v=3.3.7"></script>
+
+
+
+    <!-- Flot -->
+    <script src="js/plugins/flot/jquery.flot.js"></script>
+    <script src="js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="js/plugins/flot/jquery.flot.spline.js"></script>
+    <script src="js/plugins/flot/jquery.flot.resize.js"></script>
+    <script src="js/plugins/flot/jquery.flot.pie.js"></script>
+    <script src="js/plugins/flot/jquery.flot.symbol.js"></script>
+
+
+    <!-- 自定义js -->
+    <script src="js/content.js?v=1.0.0"></script>
+
+    <!-- ECharts -->
+    <script src="js/plugins/echarts/echarts.min.js"></script>
+	
+	<!-- 配置 -->
+	<script src="/config.js"></script>
+	
+	<!-- 自定义js -->
+    <script src="js/index_admin.js"></script>
+
+</body>
+
+</html>

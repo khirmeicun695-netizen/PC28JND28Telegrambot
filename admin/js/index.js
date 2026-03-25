@@ -1,0 +1,18 @@
+$(function(){
+		$('title').html(projectName)
+		$('#company').text(companyName)
+		$('#company').attr('href',companyWebUrl);
+		$.ajax({
+		    type:"get",
+		    url:url+"/login/check",
+		    data:{
+		        "token":$.cookie('session'),
+		    },
+		    success:function(msg){
+				if(msg.message!=1){
+					window.location.href="/login.html"; 
+					layer.msg("登录失效,请重新登录！")
+				}
+		    }
+		})
+	})
