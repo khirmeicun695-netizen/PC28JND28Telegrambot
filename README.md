@@ -31,6 +31,32 @@ This is a Canada 28 game system based on Node.js and Telegram Bot, providing com
 - **区块链集成**: TRON (TRC20)
 - **Blockchain Integration**: TRON (TRC20)
 
+## 更新日志
+
+## Update Log
+
+### 1. 配置管理系统重构 
+- 创建 system_config 数据库表存储配置 
+- 实现配置从 conf.js 文件迁移到数据库 
+- 开发配置代理模块 ( confProxy.js ) 和配置管理器 ( configManager.js ) 
+- 添加配置缓存机制，支持实时配置更新 
+
+### 2. 下注功能修复 
+- 修复余额扣除和下注记录插入的 事务问题 ，确保原子性操作 
+- 修复 peilv 字段数据截断错误，更新完整的赔率配置 
+- 添加缺失的下注指令支持： d=单 , x=小 , s=双 , dan=单 
+- 修复梭哈逻辑中的限注检查错误 
+
+### 3. API 和数据处理 
+- 添加 body-parser 中间件处理 POST 请求体 
+- 修复配置读取的异步加载问题 
+- 优化错误处理和用户反馈机制 
+
+### 4. 其他改进 
+- 修复 conf.js 语法错误（缺少闭合括号） 
+- 优化数据库连接和查询逻辑 
+- 完善日志记录和调试功能
+
 ## 核心功能
 
 ## Core Features
