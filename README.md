@@ -96,6 +96,12 @@ This is a Canada 28 game system based on Node.js and Telegram Bot, providing com
 ![测试截图3](./testimg/testimg3.png)
 ![测试截图4](./testimg/testimg4.png)
 
+## 后台管理系统截图
+
+## Backend Management System Screenshots
+
+![后台管理系统截图](./testimg/testimg5.png)
+
 ## 项目结构
 
 ## Project Structure
