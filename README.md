@@ -8,6 +8,10 @@
 
 此项目不断持续更新中，其中有不懂的问题可以联系我们，Telegram [@qazwsx3edc1](https://t.me/qazwsx3edc1)\
 This project is continuously updated. If you have any questions, please contact us on Telegram: [@qazwsx3edc1](https://t.me/qazwsx3edc1)
+更新计划
+1：添加微信 支付宝自动上分
+2：添加多群开奖
+3：添加多个上下分管理
 
 ## 项目简介
 
